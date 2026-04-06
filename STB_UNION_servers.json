@@ -2,15 +2,25 @@
   "servers": [
     {
       "type": "stalker",
-      "name": "My Stalker Server",
-      "url": "http:",
-      "mac": "00:1A:79:XX:XX:XX",
+      "name": "700730",
+      "url": "http://700730.org:8080/c/",
+      "mac": "00:1A:79:CA:F9:FE",
       "timezone": "Europe/Paris",
       "token": null,
       "expires": null
+    },
+    {
+      "type": "xtream",
+      "name": "yy66",
+      "host": "http://yy66.dtwscpop.top",
+      "port": 8080,
+      "username": "vfwk5KVJxwhb",
+      "password": "PKdYMMtyeAvs",
+      "base_url": "http://example.com:8080",
+      "use_https": false
     }
   ],
-  "last_server": null,
+  "last_server": "700730",
   "settings": {
     "user_agent": "Mozilla/5.0 (QtEmbedded; U; Linux; C)",
     "timeout": 15,
