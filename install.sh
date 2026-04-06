@@ -9,14 +9,17 @@ BACKUP_DIR="/etc/enigma2/backups"
 rm -rf "$PLUGIN_DIR"
 
 # Sauvegarde du fichier serveurs s'il existe
+echo "🔍 Vérification du fichier serveurs existant..."
 if [ -f "$SERVERS_FILE" ]; then
-    echo "📦 Sauvegarde du fichier serveurs existant..."
+    echo "📦 Fichier trouvé ! Sauvegarde en cours..."
     mkdir -p "$BACKUP_DIR"
     BACKUP_FILE="$BACKUP_DIR/STB_UNION_servers_$(date +%Y%m%d_%H%M%S).json"
     cp "$SERVERS_FILE" "$BACKUP_FILE"
     echo "✅ Sauvegarde créée : $BACKUP_FILE"
+    ls -la "$BACKUP_FILE"
 else
-    echo "ℹ️ Aucun fichier serveurs existant trouvé."
+    echo "ℹ️ Aucun fichier serveurs existant trouvé à : $SERVERS_FILE"
+    echo "   (Première installation ou fichier supprimé)"
 fi
 
 # Téléchargement et extraction directe dans /tmp
@@ -28,17 +31,11 @@ echo "📦 Extraction vers $PLUGIN_DIR..."
 mkdir -p "$PLUGIN_DIR"
 tar -xzf /tmp/STB_UNION_E2.tar.gz -C /usr/lib/enigma2/python/Plugins/Extensions/
 
-# Ajout du fichier serveurs (seulement s'il n'existe pas ou si forcé)
-if [ ! -f "$SERVERS_FILE" ]; then
-    echo "➕ Ajout du fichier serveurs..."
-    mkdir -p /etc/enigma2
-    wget -q -O "$SERVERS_FILE" "$SERVERS_URL"
-    echo "✅ Fichier serveurs installé"
-else
-    echo "⚠️ Le fichier serveurs existe déjà et a été sauvegardé."
-    echo "   Pour installer la nouvelle version, supprimez-le d'abord :"
-    echo "   rm $SERVERS_FILE"
-fi
+# Ajout du fichier serveurs (toujours installer la nouvelle version)
+echo "➕ Installation du nouveau fichier serveurs..."
+mkdir -p /etc/enigma2
+wget -q -O "$SERVERS_FILE" "$SERVERS_URL"
+echo "✅ Nouveau fichier serveurs installé"
 
 # Nettoyage
 rm -f /tmp/STB_UNION_E2.tar.gz
@@ -62,20 +59,20 @@ echo "║                                                                       
 echo "║                            SCRIPT D'INSTALLATION V1.1                           ║"
 echo "║                                 INTERFACE ENIGMA2                               ║"
 echo "╚═════════════════════════════════════════════════════════════════════════════════╝"
-echo "#########################################################"
-echo "#       STB_UNION E2 INSTALLED SUCCESSFULLY            #"
-echo "#                 by ilyasM6 / electroyassine           #"
-echo "#########################################################"
+echo "###################################################################################"
+echo "#                           STB_UNION E2 INSTALLED SUCCESSFULLY                    #"
+echo "#                               by ilyasM6 / electroyassine                        #"
+echo "###################################################################################""
 
 # Afficher les sauvegardes existantes
-if [ -d "$BACKUP_DIR" ] && [ "$(ls -A $BACKUP_DIR)" ]; then
+if [ -d "$BACKUP_DIR" ] && [ "$(ls -A $BACKUP_DIR 2>/dev/null)" ]; then
     echo "#           Sauvegardes disponibles :                 #"
     ls -1 "$BACKUP_DIR" | sed 's/^/#           - /'
-    echo "#########################################################"
+    echo "################################################################################"
 fi
 
-echo "#           your Device will RESTART Now                #"
-echo "#########################################################"
+echo "#                            your Device will RESTART Now                          #"
+echo "####################################################################################"
 sleep 3
 init 4 && sleep 2 && init 3
 exit 0
