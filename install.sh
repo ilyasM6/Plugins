@@ -16,10 +16,8 @@ if [ -f "$SERVERS_FILE" ]; then
     BACKUP_FILE="$BACKUP_DIR/STB_UNION_servers_$(date +%Y%m%d_%H%M%S).json"
     cp "$SERVERS_FILE" "$BACKUP_FILE"
     echo "✅ Sauvegarde créée : $BACKUP_FILE"
-    ls -la "$BACKUP_FILE"
 else
     echo "ℹ️ Aucun fichier serveurs existant trouvé à : $SERVERS_FILE"
-    echo "   (Première installation ou fichier supprimé)"
 fi
 
 # Téléchargement et extraction directe dans /tmp
@@ -31,7 +29,7 @@ echo "📦 Extraction vers $PLUGIN_DIR..."
 mkdir -p "$PLUGIN_DIR"
 tar -xzf /tmp/STB_UNION_E2.tar.gz -C /usr/lib/enigma2/python/Plugins/Extensions/
 
-# Ajout du fichier serveurs (toujours installer la nouvelle version)
+# Ajout du fichier serveurs
 echo "➕ Installation du nouveau fichier serveurs..."
 mkdir -p /etc/enigma2
 wget -q -O "$SERVERS_FILE" "$SERVERS_URL"
@@ -64,15 +62,18 @@ echo "#                           STB_UNION E2 INSTALLED SUCCESSFULLY           
 echo "#                               by ilyasM6 / electroyassine                        #"
 echo "###################################################################################""
 
-# Afficher les sauvegardes existantes
-if [ -d "$BACKUP_DIR" ] && [ "$(ls -A $BACKUP_DIR 2>/dev/null)" ]; then
-    echo "#           Sauvegardes disponibles :                 #"
-    ls -1 "$BACKUP_DIR" | sed 's/^/#           - /'
-    echo "################################################################################"
+# Afficher les sauvegardes existantes (version corrigée)
+if [ -d "$BACKUP_DIR" ]; then
+    BACKUP_COUNT=$(ls -1 "$BACKUP_DIR" 2>/dev/null | wc -l)
+    if [ "$BACKUP_COUNT" -gt 0 ]; then
+        echo "#           Sauvegardes disponibles :                 #"
+        ls -1 "$BACKUP_DIR" 2>/dev/null | sed 's/^/#           - /'
+        echo "#########################################################"
+    fi
 fi
 
-echo "#                            your Device will RESTART Now                          #"
-echo "####################################################################################"
+echo "#           your Device will RESTART Now                #"
+echo "#########################################################"
 sleep 3
 init 4 && sleep 2 && init 3
 exit 0
