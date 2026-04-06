@@ -1,65 +1,46 @@
-#!/bin/bash
+#!/bin/sh
 
-# ==================== CONFIGURATION DES COULEURS ====================
-declare -A COLORS=(
-    [BLUE]='\033[0;34m'
-    [BOLD]='\033[1m'
-    [RESET]='\033[0m'
-    [RED]='\033[0;31m'
-    [GREEN]='\033[0;32m'
-    [YELLOW]='\033[1;33m'
-)
+# Script d'installation du plugin STB_UNION E2
+# Auteur: Script automatique
+# Date: $(date +"%Y-%m-%d %H:%M:%S")
 
-# ==================== FONCTIONS D'AFFICHAGE ====================
-print_banner() {
-    clear
-    echo -e "${COLORS[BLUE]}${COLORS[BOLD]}"
-    echo "╔══════════════════════════════════════════════════════════════════════╗"
-    echo "║                                                                      ║"
-    echo "║     ███████╗████████╗██████╗     ██╗   ██╗███╗   ██╗██╗ ██████╗ ███╗   ██╗"
-    echo "║     ██╔════╝╚══██╔══╝██╔══██╗    ██║   ██║████╗  ██║██║██╔═══██╗████╗  ██║"
-    echo "║     ███████╗   ██║   ██████╔╝    ██║   ██║██╔██╗ ██║██║██║   ██║██╔██╗ ██║"
-    echo "║     ╚════██║   ██║   ██╔══██╗    ██║   ██║██║╚██╗██║██║██║   ██║██║╚██╗██║"
-    echo "║     ███████║   ██║   ██████╔╝    ╚██████╔╝██║ ╚████║██║╚██████╔╝██║ ╚████║"
-    echo "║     ╚══════╝   ╚═╝   ╚═════╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝"
-    echo "║                                                                      ║"
-    echo "║                    SCRIPT D'INSTALLATION V2.0                        ║"
-    echo "║                     INTERFACE ENIGMA2                                ║"
-    echo "╚══════════════════════════════════════════════════════════════════════╝"
-    echo -e "${COLORS[RESET]}"
-}
+# Couleurs pour les messages
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-# Fonction pour afficher les messages
-print_message() {
-    echo -e "${COLORS[BLUE]}[$(date +"%H:%M:%S")]${COLORS[RESET]} $1"
-}
-
-print_success() {
-    echo -e "${COLORS[GREEN]}✓ SUCCÈS:${COLORS[RESET]} $1"
-}
-
-print_error() {
-    echo -e "${COLORS[RED]}✗ ERREUR:${COLORS[RESET]} $1"
-}
-
-print_warning() {
-    echo -e "${COLORS[YELLOW]}⚠ ATTENTION:${COLORS[RESET]} $1"
-}
-
-print_header() {
-    echo -e "\n${COLORS[BLUE]}═══════════════════════════════════════════════════════════${COLORS[RESET]}"
-    echo -e "${COLORS[GREEN]}   Installation du plugin $PLUGIN_NAME${COLORS[RESET]}"
-    echo -e "${COLORS[BLUE]}═══════════════════════════════════════════════════════════${COLORS[RESET]}\n"
-}
-
-# ==================== VARIABLES ====================
+# Variables
 PLUGIN_URL="https://github.com/ilyasM6/Plugins/raw/main/STB_UNION%20E2.tar.gz"
 TEMP_DIR="/tmp"
 PLUGIN_NAME="STB_UNION E2"
 PLUGIN_FILE="STB_UNION_E2.tar.gz"
 INSTALL_PATH="/usr/lib/enigma2/python/Plugins/Extensions"
 
-# ==================== FONCTIONS D'INSTALLATION ====================
+# Fonction pour afficher les messages
+print_message() {
+    echo -e "${BLUE}[$(date +"%H:%M:%S")]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}✓ SUCCÈS:${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}✗ ERREUR:${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠ ATTENTION:${NC} $1"
+}
+
+print_header() {
+    echo -e "\n${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}   Installation du plugin $PLUGIN_NAME${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
+}
+
 # Vérification des droits root
 check_root() {
     if [ "$(id -u)" != "0" ]; then
@@ -80,16 +61,12 @@ cleanup() {
 # Vérification de l'espace disque
 check_disk_space() {
     print_message "Vérification de l'espace disque..."
-    if [ -d "$INSTALL_PATH" ]; then
-        available_space=$(df -m "$INSTALL_PATH" | awk 'NR==2 {print $4}')
-        if [ "$available_space" -lt 50 ]; then
-            print_error "Espace disque insuffisant (moins de 50MB disponible)"
-            exit 1
-        fi
-        print_success "Espace disque suffisant: ${available_space}MB disponible"
-    else
-        print_warning "Le répertoire d'installation n'existe pas encore"
+    available_space=$(df -m "$INSTALL_PATH" | awk 'NR==2 {print $4}')
+    if [ "$available_space" -lt 50 ]; then
+        print_error "Espace disque insuffisant (moins de 50MB disponible)"
+        exit 1
     fi
+    print_success "Espace disque suffisant: ${available_space}MB disponible"
 }
 
 # Téléchargement du plugin
@@ -139,13 +116,12 @@ check_file_integrity() {
 
 # Sauvegarde de l'ancienne version si elle existe
 backup_old_version() {
-    local plugin_dir="$INSTALL_PATH/$PLUGIN_NAME"
-    if [ -d "$plugin_dir" ]; then
+    if [ -d "$INSTALL_PATH/$PLUGIN_NAME" ]; then
         print_warning "Une version existante du plugin a été trouvée"
         backup_path="$INSTALL_PATH/${PLUGIN_NAME}_backup_$(date +%Y%m%d_%H%M%S)"
         print_message "Création d'une sauvegarde dans: $backup_path"
         
-        mv "$plugin_dir" "$backup_path"
+        mv "$INSTALL_PATH/$PLUGIN_NAME" "$backup_path"
         if [ $? -eq 0 ]; then
             print_success "Sauvegarde créée avec succès"
         else
@@ -182,10 +158,11 @@ extract_plugin() {
     if [ $? -eq 0 ]; then
         print_success "Décompression réussie"
         
-        # Chercher le dossier du plugin
+        # Trouver le dossier extrait et le déplacer
         extracted_dir=$(find "$temp_extract" -type d -name "*STB_UNION*" -o -type d -name "*stb_union*" | head -1)
         
         if [ -z "$extracted_dir" ]; then
+            # Si aucun dossier spécifique trouvé, prendre le premier dossier
             extracted_dir=$(find "$temp_extract" -mindepth 1 -maxdepth 1 -type d | head -1)
         fi
         
@@ -200,11 +177,12 @@ extract_plugin() {
                 exit 1
             fi
         else
+            # Si c'est une structure différente, copier tout le contenu
             print_message "Structure particulière détectée, copie du contenu..."
             cp -r "$temp_extract"/* "$INSTALL_PATH/$PLUGIN_NAME"
         fi
         
-        # Nettoyage
+        # Nettoyage du répertoire temporaire d'extraction
         rm -rf "$temp_extract"
     else
         print_error "Échec de la décompression"
@@ -215,15 +193,17 @@ extract_plugin() {
 # Définition des permissions
 set_permissions() {
     print_message "Configuration des permissions..."
-    local plugin_dir="$INSTALL_PATH/$PLUGIN_NAME"
     
-    if [ -d "$plugin_dir" ]; then
-        find "$plugin_dir" -type d -exec chmod 755 {} \;
-        find "$plugin_dir" -type f -exec chmod 644 {} \;
-        find "$plugin_dir" -name "*.sh" -exec chmod 755 {} \;
-        find "$plugin_dir" -name "*.py" -exec chmod 644 {} \;
-        find "$plugin_dir" -name "*.so" -exec chmod 755 {} \;
-        find "$plugin_dir" -name "*.ipk" -exec chmod 755 {} \;
+    if [ -d "$INSTALL_PATH/$PLUGIN_NAME" ]; then
+        # Permissions pour les dossiers
+        find "$INSTALL_PATH/$PLUGIN_NAME" -type d -exec chmod 755 {} \;
+        # Permissions pour les fichiers
+        find "$INSTALL_PATH/$PLUGIN_NAME" -type f -exec chmod 644 {} \;
+        # Permissions pour les fichiers exécutables
+        find "$INSTALL_PATH/$PLUGIN_NAME" -name "*.sh" -exec chmod 755 {} \;
+        find "$INSTALL_PATH/$PLUGIN_NAME" -name "*.py" -exec chmod 644 {} \;
+        find "$INSTALL_PATH/$PLUGIN_NAME" -name "*.so" -exec chmod 755 {} \;
+        find "$INSTALL_PATH/$PLUGIN_NAME" -name "*.ipk" -exec chmod 755 {} \;
         
         print_success "Permissions configurées avec succès"
     else
@@ -235,16 +215,17 @@ set_permissions() {
 # Vérification de l'installation
 verify_installation() {
     print_message "Vérification de l'installation..."
-    local plugin_dir="$INSTALL_PATH/$PLUGIN_NAME"
     
-    if [ -d "$plugin_dir" ]; then
-        if [ -f "$plugin_dir/plugin.py" ] || [ -f "$plugin_dir/__init__.py" ]; then
+    if [ -d "$INSTALL_PATH/$PLUGIN_NAME" ]; then
+        # Vérifier si le plugin contient des fichiers essentiels
+        if [ -f "$INSTALL_PATH/$PLUGIN_NAME/plugin.py" ] || [ -f "$INSTALL_PATH/$PLUGIN_NAME/__init__.py" ]; then
             print_success "Plugin installé correctement avec les fichiers essentiels"
         else
             print_warning "Plugin installé mais fichiers essentiels manquants"
         fi
         
-        plugin_size=$(du -sh "$plugin_dir" | cut -f1)
+        # Afficher le contenu du dossier
+        plugin_size=$(du -sh "$INSTALL_PATH/$PLUGIN_NAME" | cut -f1)
         print_message "Taille du plugin: $plugin_size"
         
         return 0
@@ -258,6 +239,7 @@ verify_installation() {
 restart_enigma2() {
     print_message "Redémarrage de l'interface Enigma2..."
     
+    # Différentes méthodes de redémarrage
     if command -v init >/dev/null 2>&1; then
         print_message "Utilisation de init 4 && init 3..."
         init 4 && sleep 2 && init 3
@@ -276,14 +258,8 @@ restart_enigma2() {
     fi
 }
 
-# ==================== FONCTION PRINCIPALE ====================
+# Fonction principale
 main() {
-    # Afficher la bannière
-    print_banner
-    
-    # Attendre 2 secondes pour que l'utilisateur voie la bannière
-    sleep 2
-    
     print_header
     
     # Vérifications préalables
@@ -300,10 +276,11 @@ main() {
     
     # Vérification finale
     if verify_installation; then
-        echo -e "\n${COLORS[GREEN]}╔══════════════════════════════════════════════════════════╗${COLORS[RESET]}"
-        echo -e "${COLORS[GREEN]}║         INSTALLATION TERMINÉE AVEC SUCCÈS !            ║${COLORS[RESET]}"
-        echo -e "${COLORS[GREEN]}╚══════════════════════════════════════════════════════════╝${COLORS[RESET]}"
-        echo -e "\n${COLORS[YELLOW]}Détails de l'installation:${COLORS[RESET]}"
+        print_header
+        echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${GREEN}║         INSTALLATION TERMINÉE AVEC SUCCÈS !            ║${NC}"
+        echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
+        echo -e "\n${YELLOW}Détails de l'installation:${NC}"
         echo -e "  • Plugin: $PLUGIN_NAME"
         echo -e "  • Emplacement: $INSTALL_PATH/$PLUGIN_NAME"
         echo -e "  • Date: $(date +"%d/%m/%Y à %H:%M:%S")"
@@ -312,11 +289,11 @@ main() {
         cleanup
         
         # Redémarrage d'Enigma2
-        echo -e "\n${COLORS[YELLOW]}Redémarrage de l'interface Enigma2...${COLORS[RESET]}"
+        echo -e "\n${YELLOW}Redémarrage de l'interface Enigma2...${NC}"
         sleep 2
         restart_enigma2
         
-        echo -e "\n${COLORS[GREEN]}✓ Installation complète et réussie !${COLORS[RESET]}\n"
+        echo -e "\n${GREEN}✓ Installation complète et réussie !${NC}\n"
         exit 0
     else
         print_error "L'installation a échoué"
@@ -325,9 +302,6 @@ main() {
     fi
 }
 
-# ==================== EXÉCUTION ====================
-# Gestion des interruptions
+# Exécution du script avec gestion des erreurs
 trap 'print_error "Script interrompu"; cleanup; exit 1' INT TERM
-
-# Lancer le script
 main "$@"
