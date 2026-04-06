@@ -1,0 +1,19 @@
+{
+  "servers": [
+    {
+      "type": "stalker",
+      "name": "My Stalker Server",
+      "url": "http:",
+      "mac": "00:1A:79:XX:XX:XX",
+      "timezone": "Europe/Paris",
+      "token": null,
+      "expires": null
+    }
+  ],
+  "last_server": null,
+  "settings": {
+    "user_agent": "Mozilla/5.0 (QtEmbedded; U; Linux; C)",
+    "timeout": 15,
+    "aspect_ratio": "16:9"
+  }
+}
